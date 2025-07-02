@@ -1,0 +1,108 @@
+// launcher/FxApplicationLauncher.java
+package com.ppi.utility.importer.launcher;
+
+import com.ppi.utility.importer.MainController;
+import com.ppi.utility.importer.PpiExcelImporterApplication; // Import the Spring Boot app class
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import java.util.Objects;
+
+/**
+ * Dedicated JavaFX Application launcher class.
+ * This class extends javafx.application.Application and is responsible for
+ * setting up the JavaFX UI. It gets the Spring application context
+ * from PpiExcelImporterApplication.
+ */
+public class FxApplicationLauncher extends Application {
+
+    private ConfigurableApplicationContext applicationContext;
+
+    /**
+     * Initializes the JavaFX application. This is where we get the Spring context.
+     * This method is called by the JavaFX Application thread before start().
+     */
+    @Override
+    public void init() throws Exception {
+        System.out.println("DEBUG: FxApplicationLauncher init() called. Getting Spring context...");
+        // Get the already initialized Spring application context
+        this.applicationContext = PpiExcelImporterApplication.getApplicationContext();
+        if (this.applicationContext == null) {
+            System.err.println("ERROR: Spring application context is null in FxApplicationLauncher.init().");
+            throw new IllegalStateException("Spring application context not initialized.");
+        }
+        System.out.println("DEBUG: Spring context obtained successfully in FxApplicationLauncher.init().");
+    }
+
+    /**
+     * The main entry point for the JavaFX application.
+     * This method is called after init() has completed.
+     * It sets up the primary stage and loads the FXML UI.
+     *
+     * @param primaryStage The primary stage for this application, onto which
+     * the application scene can be set.
+     * @throws Exception if an error occurs during application startup.
+     */
+    @Override
+    public void start(Stage primaryStage) {
+        System.out.println("DEBUG: FxApplicationLauncher start() called. Setting up JavaFX UI...");
+        try {
+            // Create an FXMLLoader and set its controller factory to allow Spring
+            // to provide controller instances.
+            System.out.println("DEBUG: Attempting to load /main-view.fxml...");
+            FXMLLoader fxmlLoader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/main-view.fxml")));
+            // Use the Spring context to get beans for controllers
+            fxmlLoader.setControllerFactory(applicationContext::getBean);
+
+            // Load the FXML file and get the root node.
+            Parent root = fxmlLoader.load();
+            System.out.println("DEBUG: FXML loaded successfully. Root node obtained.");
+
+            // Get the controller instance managed by Spring
+            MainController mainController = fxmlLoader.getController();
+            mainController.setPrimaryStage(primaryStage);
+            System.out.println("DEBUG: MainController set up with primary stage.");
+
+            // Create a scene with the loaded FXML root and set its dimensions.
+            Scene scene = new Scene(root, 600, 400);
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles.css")).toExternalForm());
+            System.out.println("DEBUG: Scene created and stylesheet applied.");
+
+            // Set the scene to the primary stage.
+            primaryStage.setTitle("PPI Utility - File Importer");
+            primaryStage.setScene(scene);
+            primaryStage.setResizable(false);
+            System.out.println("DEBUG: Primary stage configured. Attempting to show stage...");
+            primaryStage.show(); // Display the window
+            System.out.println("DEBUG: primaryStage.show() called. UI window should be visible.");
+        } catch (Exception e) {
+            System.err.println("ERROR: Error during JavaFX application start:");
+            e.printStackTrace();
+            // If an error occurs during UI setup, ensure the Spring context is closed
+            if (applicationContext != null) {
+                applicationContext.close();
+            }
+            // Exit the application gracefully
+            System.exit(1);
+        }
+    }
+
+    /**
+     * This method is called when the application should stop.
+     * It closes the Spring application context and exits the JavaFX platform.
+     */
+    @Override
+    public void stop() {
+        System.out.println("DEBUG: FxApplicationLauncher stop() called. Closing Spring context and exiting...");
+        // Close the Spring application context gracefully.
+        if (applicationContext != null) {
+            applicationContext.close();
+        }
+        // Exit the JavaFX platform.
+        // System.exit(0) is typically handled by the JavaFX runtime after Platform.exit()
+    }
+}
