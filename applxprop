@@ -1,0 +1,22 @@
+# application.properties
+spring.application.name=importer
+spring.main.web-application-type=none
+
+# Oracle Database Configuration
+# REPLACE WITH YOUR ACTUAL ORACLE DATABASE DETAILS
+spring.datasource.url=jdbc:oracle:thin:@your_oracle_host:your_oracle_port/your_service_name
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+
+# JPA/Hibernate Configuration
+spring.jpa.hibernate.ddl-auto=update # Options: none, validate, update, create, create-drop
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.OracleDialect
+spring.jpa.open-in-view=false # Recommended for performance in non-web applications
+
+# Optional: Connection pool settings (HikariCP is default for Spring Boot)
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.connection-timeout=30000 # 30 seconds
+spring.datasource.hikari.idle-timeout=600000 # 10 minutes
+spring.datasource.hikari.max-lifetime=1800000 # 30 minutes
