@@ -1,0 +1,48 @@
+// PpiExcelImporterApplication.java
+package com.ppi.utility.importer;
+
+import com.ppi.utility.importer.launcher.FxApplicationLauncher; // Import the new launcher
+import javafx.application.Application; // Still needed for launch() call
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+/**
+ * Main Spring Boot application class for the PPI Excel Importer.
+ * This class now primarily sets up the Spring application context
+ * and then delegates to a separate JavaFX launcher.
+ */
+@SpringBootApplication
+public class PpiExcelImporterApplication {
+
+    // Hold the Spring application context statically so it can be accessed by the JavaFX launcher
+    private static ConfigurableApplicationContext applicationContext;
+
+    public static ConfigurableApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    /**
+     * Main method to launch the Spring Boot application and then the JavaFX application.
+     *
+     * @param args Command line arguments.
+     */
+    public static void main(String[] args) {
+        System.out.println("DEBUG: PpiExcelImporterApplication main method called. Starting Spring context...");
+
+        // 1. Start Spring Boot application first
+        applicationContext = SpringApplication.run(PpiExcelImporterApplication.class, args);
+        System.out.println("DEBUG: Spring context started successfully.");
+
+        // 2. Launch the JavaFX application
+        // The JavaFX toolkit must be launched from a separate class to avoid issues
+        // with the Spring Boot fat JAR classloader and JavaFX's native libraries.
+        System.out.println("DEBUG: Launching JavaFX application via FxApplicationLauncher...");
+        // JavaFX launch method expects String[] args, so we pass them.
+        Application.launch(FxApplicationLauncher.class, args);
+        System.out.println("DEBUG: JavaFX launch() completed.");
+
+        // When JavaFX application exits, it will call Platform.exit() and then System.exit(0)
+        // This main method will then complete and the JVM will shut down.
+    }
+}
