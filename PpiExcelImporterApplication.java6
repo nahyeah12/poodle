@@ -1,0 +1,38 @@
+// PpiExcelImporterApplication.java
+package com.ppi.utility.importer;
+
+import com.ppi.utility.importer.launcher.FxApplicationLauncher; // Import the new launcher
+import javafx.application.Application; // Still needed for the launch() call
+
+/**
+ * Main entry point for the application.
+ * This class is now a simple launcher that delegates to the JavaFX Application.
+ * The Spring Boot application context will be initialized within the FxApplicationLauncher.
+ */
+// REMOVED: @SpringBootApplication annotation from here
+public class PpiExcelImporterApplication {
+
+    /**
+     * Main method to launch the JavaFX application.
+     * The Spring Boot context will be initialized by the FxApplicationLauncher's init() method.
+     *
+     * @param args Command line arguments.
+     */
+    public static void main(String[] args) {
+        System.out.println("DEBUG: PpiExcelImporterApplication main method called. Launching JavaFX application...");
+
+        // Set system properties for JavaFX debugging and platform hints
+        System.setProperty("javafx.embed.singleThread", "true");
+        System.setProperty("java.awt.headless", "false");
+        System.setProperty("prism.verbose", "true");
+        System.setProperty("prism.debug", "true");
+        System.setProperty("javafx.verbose", "true");
+        System.setProperty("javafx.platform", "Windows"); // Explicitly set platform
+
+        // Launch the JavaFX application. This will internally call init(), start(), and stop() methods
+        // of FxApplicationLauncher on the appropriate JavaFX threads.
+        Application.launch(FxApplicationLauncher.class, args);
+
+        System.out.println("DEBUG: JavaFX launch() completed. Application should now be running or exiting.");
+    }
+}
