@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ppi.utility.importer</groupId>
+    <artifactId>importer</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>importer</name>
+
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Spring Boot Version -->
+        <spring-boot.version>3.2.5</spring-boot.version>
+        <!-- JavaFX Version -->
+        <javafx.version>22</javafx.version>
+        <!-- Apache POI for Excel -->
+        <poi.version>5.2.5</poi.version>
+        <!-- OpenCSV for CSV -->
+        <opencsv.version>5.9</opencsv.version>
+        <!-- Oracle JDBC Driver -->
+        <oracle.jdbc.version>23.4.0.24.05</oracle.jdbc.version> <!-- Use a recent version -->
+    </properties>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.5</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <dependencies>
+        <!-- Spring Boot Starter for JPA (includes Hibernate) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- Oracle JDBC Driver (for database connection) -->
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc11</artifactId> <!-- Changed to ojdbc11 for Java 21 compatibility -->
+            <version>${oracle.jdbc.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Spring Boot Test Starter (for unit tests) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JavaFX Dependencies - Ensure these are pulled in by Spring Boot Fat JAR -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>win</classifier> <!-- Adjust for your OS: win, linux, mac -->
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>win</classifier> <!-- Adjust for your OS: win, linux, mac -->
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>win</classifier> <!-- Adjust for your OS: win, linux, mac -->
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>win</classifier> <!-- Adjust for your OS: win, linux, mac -->
+        </dependency>
+
+        <!-- Apache POI for Excel files -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <!-- OpenCSV for CSV files - Keep if you plan to support CSV later -->
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>${opencsv.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Maven Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.12.1</version>
+                <configuration>
+                    <release>${java.version}</release>
+                </configuration>
+            </plugin>
+
+            <!-- Spring Boot Maven Plugin for creating executable JAR -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Main class now points to the Spring Boot application, which then launches JavaFX -->
+                    <mainClass>com.ppi.utility.importer.PpiExcelImporterApplication</mainClass>
+                    <excludeDevtools>true</excludeDevtools>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <classifier>standalone</classifier>
+                    <!-- IMPORTANT: Exclude JavaFX modules from being repackaged into BOOT-INF/lib -->
+                    <excludes>
+                        <exclude>
+                            <groupId>org.openjfx</groupId>
+                            <artifactId>*</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Maven Surefire Plugin to skip tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
